@@ -5,8 +5,9 @@ from monster import Monster
 pygame.init()
 
 #player stats 
-tutorial = False#True#False
+tutorial = False
 start = True
+Help = False
 
 health = 10
 strenght = 1
@@ -17,6 +18,7 @@ level = 0
 #Other stats
 attackm = 0
 healthm = 3
+healthm2 = healthm
 
 #gameinfo
 RED = (255, 0, 0)
@@ -77,38 +79,49 @@ while carryOn:
                      health = 0
                      carryOn=False
             if event.type == pygame.MOUSEBUTTONDOWN: 
-              if SCREENWIDTH/2 <= mouse[0] <= SCREENWIDTH/2+90 and SCREENHEIGHT/2 <= mouse[1] <= SCREENHEIGHT/2+40:  
-                  start = False 
-                  screen.fill(GREY)
-                  pygame.display.flip()
+              if start == True:
+                  if SCREENWIDTH/2 <= mouse[0] <= SCREENWIDTH/2+90 and SCREENHEIGHT/2 <= mouse[1] <= SCREENHEIGHT/2+40:  
+                    start = False 
+                    screen.fill(GREY)
+                    pygame.display.flip()
+                  if SCREENWIDTH/2 <= mouse[0] <= SCREENWIDTH/2+90 and SCREENHEIGHT/2+30 <= mouse[1] <= SCREENHEIGHT/2+70: 
+                    start = False
+                    Help = True
+                    screen.fill(GREY)
+                    pygame.display.flip()
 
         keys = pygame.key.get_pressed()
+
         #Naar links
         if keys[pygame.K_a]:
+          if stappen > -200: 
             stappen -= 5
             PlayerChar.moveLeft(5, stappen)
-            if stappen < -200:
-              print("max")
+
         #Naar rechts
         if keys[pygame.K_d]:
+          if stappen < 450:
             stappen += 5
             PlayerChar.moveRight(5, stappen)
+          elif stappen >= 450:
             if healthm <= 0:
-              if stappen > 450:
-                PlayerChar.moveLeft(450, stappen)
-                stappen = 0
-                healthm = 10
-                Monster1 = Monster("Green", 40, 60, attackm, healthm)
-                Monster1.rect.x = 500
-                Monster1.rect.y = 300
-                all_sprites_list.add(Monster1)
-                nextarrow = myfont.render(" ", False, (0, 0, 0))
-                screen.blit(nextarrow,(500,300))
-                level += 1
-            if stappen > 450:
-              print("max")
-
-                
+              print("Next level")
+              PlayerChar.rect.x = 100
+              PlayerChar.rect.y = 300
+              stappen = 0
+              Monster1 = Monster("Green", 40, 60, attackm, healthm)
+              Monster1.rect.x = 500
+              Monster1.rect.y = 300
+              all_sprites_list.add(Monster1)
+              nextarrow = myfont.render(" ", False, (0, 0, 0))
+              screen.blit(nextarrow,(500,300))
+              
+              level += 1
+              strenght += 1
+              healthm = healthm2*2
+              healthm2 = healthm
+              attackm += 1
+                    
 
         #Attack (Q)
         if keys[pygame.K_q]: 
@@ -122,7 +135,7 @@ while carryOn:
               defense = random.randint(1,5)
               if ultra == 3: 
                 damage = strenght + strenght
-                print("\n"+"Je deed meer schade dan normaal!"+"\n")
+                print("\n"+"Je deed meer schade dan normaal!")
               else:
                 damage = strenght
 
@@ -131,16 +144,17 @@ while carryOn:
                 print("Het monster ontweek je aanval")
               else:
                 damage = damage
-              healthm -= damage
+                healthm -= damage
               
               if healthm > 0:
-                print(healthm)
+                print("Het monster heeft nog "+str(healthm)+" levens.")            
+                healthm = int(healthm)
               else:
                 print("Het monster is dood")
             
             
 
-        if keys[pygame.K_f]:
+        if keys[pygame.K_w]:
           defensePlr = True
           print("Je hebt meer kans dat je de volgende aanval ontwijkt")
           Played = True
@@ -149,9 +163,38 @@ while carryOn:
 
         if start == True:
           text = myfont.render("Start", False, (0,0,0))
+          texthelp = myfont.render("Help", False, (0,0,0))
           screen.blit(text , (SCREENWIDTH/2,SCREENHEIGHT/2))
+          screen.blit(texthelp , (SCREENWIDTH/2,SCREENHEIGHT/2+30))
 
-        if start == False:
+        if Help == True:
+          text = myfont.render("", False, (0,0,0))
+          texthelp = myfont.render("", False, (0,0,0))
+          screen.blit(text , (SCREENWIDTH/2,SCREENHEIGHT/2))
+          screen.blit(texthelp , (SCREENWIDTH/2,SCREENHEIGHT/2+30))
+
+
+          helptop = myfont.render("Hier vind je informatie over de controles en het doel van het spel", False, (0, 0, 0))
+
+          #Controles help
+          helpcontroles = myfont.render("Controles:", False, (0, 0, 0))
+          help1 = myfont.render("A: Loop naar links", False, (0, 0, 0))
+          help2 = myfont.render("D: Loop naar rechts", False, (0, 0, 0))
+          help3 = myfont.render("Q: Val het monster aan (Het monster kan het afwijken of je kan meer schade doen)", False, (0, 0, 0))
+          help4 = myfont.render("W: Verdedig, je hebt een grote kans dat je geen levens verliest", False, (0, 0, 0))
+
+          #Info Game
+          helpgame = myfont.render("Info over het spel:", False, (0, 0, 0))
+          help5 = myfont.render("Je moet monster vermoorden zodat je sterken wordt en naar het volgend level ga.", False, (0, 0, 0))
+          help6 = myfont.render("Je wint het spel wanneer je level 20 behaald hebt, je verliest wanneer je health 0 is.", False, (0, 0, 0))
+
+          #Zet op scherm
+          screen.blit(helptop,(25,200))
+
+
+
+
+        if start == False and Help == False:
           textsurface = myfont.render("HEALTH: "+str(health), False, (0, 0, 0))
           textsurface2 = myfont.render("STRENGHT: "+str(strenght), False, (0, 0, 0))
           textlevel = myfont.render("LEVEL: "+str(level), False, (0, 0, 0))
@@ -160,13 +203,14 @@ while carryOn:
 
           screen.blit(textsurface,(0,0))
           screen.blit(textsurface2,(0,20))
-          screen.blit(textlevel,(350,0))
+          screen.blit(textlevel,(310,0))
           screen.blit(textattack,(240,450))
           screen.blit(textdefend,(350,450))
 
-          text = myfont.render("Started", False, (GREY))
+          text = myfont.render("", False, (0,0,0))
           screen.blit(text , (SCREENWIDTH/2,SCREENHEIGHT/2))
-
+          texthelp = myfont.render("", False, (0,0,0))
+          screen.blit(texthelp , (SCREENWIDTH/2,SCREENHEIGHT/2+30))
           all_sprites_list.update()
           all_sprites_list.draw(screen)
 
@@ -175,18 +219,36 @@ while carryOn:
             time.sleep(1)
             attack_or_defend_m = random.choice(["valt aan", "verdedigd"])
             print("\n"+"Het monster "+attack_or_defend_m+"\n")
+
+            if attack_or_defend_m == "valt aan":
+              defenserandom = random.randint(1,10)
+              if defensePlr == True:  
+                if defenserandom != 1:
+                  print("Je hebt de aanval kunnen ontwijken!")
+                if defenserandom == 1:
+                  health -= attackm
+                  attackm = str(attackm)
+                  print("Het monster heeft je kunnen aanvallen! Je verliest "+attackm)
+                  attackm = int(attackm)
+              if defensePlr == False:  
+                if defenserandom <= 4:
+                  print("Je hebt de aanval kunnen ontwijken!")
+                if defenserandom > 4:
+                  health -= attackm
+                  attackm = str(attackm)
+                  print("Het monster heeft je kunnen aanvallen! Je verliest "+attackm)
+                  attackm = int(attackm)
+
           Played = False
 
         if healthm <= 0:
           pygame.sprite.Sprite.kill(Monster1) #Verwijderd monster
 
           #verandert stats
-          strenght += 1
-          healthm = health*2
-          attackm += 1
+
 
           #arrow
-          nextarrow = myfont.render("Next --> ", False, (0, 0, 0))
+          nextarrow = myfont.render("Next level --> ", False, (0, 0, 0))
           screen.blit(nextarrow,(500,300))
 
 

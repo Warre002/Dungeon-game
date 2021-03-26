@@ -35,15 +35,13 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
  
     def moveRight(self, pixels, stappen):
+      if stappen < 500:
         self.rect.x += pixels
-        print(stappen)
 
     def moveLeft(self, pixels, stappen):
       if stappen > -200:
         self.rect.x -= pixels
 
-        print(stappen)
- 
     def moveForward(self, speed):
         self.rect.y += self.speed * speed / 20
  
