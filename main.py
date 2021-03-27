@@ -18,6 +18,7 @@ level = 0
 #Other stats
 attackm = 0
 healthm = 3
+defenseM = False
 healthm2 = healthm
 
 #gameinfo
@@ -89,6 +90,13 @@ while carryOn:
                     Help = True
                     screen.fill(GREY)
                     pygame.display.flip()
+              if Help == True:
+                  if 260 <= mouse[0] <= 380 and 380 <= mouse[1] <= 470:
+                    Help = False
+                    Start = True
+                    screen.fill(GREY)
+                    pygame.display.flip()
+                  
 
         keys = pygame.key.get_pressed()
 
@@ -132,19 +140,27 @@ while carryOn:
               #Attack
               print("Je valt het monster aan!")
               ultra = random.randint(1,10)
-              defense = random.randint(1,5)
+              defense = random.randint(1,10)
               if ultra == 3: 
                 damage = strenght + strenght
                 print("\n"+"Je deed meer schade dan normaal!")
               else:
                 damage = strenght
 
-              if defense == 3:
-                damage = 0
-                print("Het monster ontweek je aanval")
+              if defenseM == False:
+                if defense == 3:
+                  damage = 0
+                  print("Het monster ontweek je aanval")
+                else:
+                  damage = damage
+                  healthm -= damage
               else:
-                damage = damage
-                healthm -= damage
+                if defense <= 3:
+                  damage = 0
+                  print("Het monster ontweek je aanval")
+                else:
+                  damage = damage
+                  healthm -= damage
               
               if healthm > 0:
                 print("Het monster heeft nog "+str(healthm)+" levens.")            
@@ -177,32 +193,48 @@ while carryOn:
           helptop = myfont.render("Hier vind je informatie over de controles en het doel van het spel", False, (0, 0, 0))
 
           #Controles help
-          helpcontroles = myfont.render("Controles:", False, (0, 0, 0))
+          helpcontroles = myfont.render("Controles/Toetsen:", False, (0, 0, 0))
           help1 = myfont.render("A: Loop naar links", False, (0, 0, 0))
           help2 = myfont.render("D: Loop naar rechts", False, (0, 0, 0))
-          help3 = myfont.render("Q: Val het monster aan (Het monster kan het afwijken of je kan meer schade doen)", False, (0, 0, 0))
+          help3 = myfont.render("Q: Val het monster aan (Het monster kan het afwijken)", False, (0, 0, 0))
           help4 = myfont.render("W: Verdedig, je hebt een grote kans dat je geen levens verliest", False, (0, 0, 0))
 
           #Info Game
           helpgame = myfont.render("Info over het spel:", False, (0, 0, 0))
-          help5 = myfont.render("Je moet monster vermoorden zodat je sterken wordt en naar het volgend level ga.", False, (0, 0, 0))
-          help6 = myfont.render("Je wint het spel wanneer je level 20 behaald hebt, je verliest wanneer je health 0 is.", False, (0, 0, 0))
+          help5 = myfont.render("Je moet monsters vermoorden zodat je sterken wordt en naar ", False, (0, 0, 0))
+          help6 = myfont.render("het volgend level kan gaan.", False, (0, 0, 0))
+          help7 = myfont.render("Je wint het spel wanneer je level 20 behaald hebt, ", False, (0, 0, 0))
+          help8 = myfont.render("je verliest wanneer je health 0 is.", False, (0, 0, 0))
+          helpback = myfont.render("START GAME", False, (0, 0, 0))
 
           #Zet op scherm
-          screen.blit(helptop,(25,200))
-
-
-
+          screen.blit(helptop,(25,25))
+          
+          screen.blit(helpcontroles,(250,70))
+          screen.blit(help1,(40,120))
+          screen.blit(help2,(40,150))
+          screen.blit(help3,(40,180))
+          screen.blit(help4,(40,210))
+         
+          screen.blit(helpgame,(250,260))
+          screen.blit(help5,(40,290))
+          screen.blit(help6,(40,320))
+          screen.blit(help7,(40,360))
+          screen.blit(help8,(40,390))
+          
+          screen.blit(helpback,(290,450))
 
         if start == False and Help == False:
+          textplrstats = myfont.render("PLAYER STATS: ", False, (0, 0, 0))
           textsurface = myfont.render("HEALTH: "+str(health), False, (0, 0, 0))
           textsurface2 = myfont.render("STRENGHT: "+str(strenght), False, (0, 0, 0))
           textlevel = myfont.render("LEVEL: "+str(level), False, (0, 0, 0))
           textattack = myfont.render("|Q: Attack|", False, (0, 0, 0))
           textdefend = myfont.render("|W: Defend|", False, (0, 0, 0))
 
-          screen.blit(textsurface,(0,0))
-          screen.blit(textsurface2,(0,20))
+          screen.blit(textplrstats,(0,0))
+          screen.blit(textsurface,(0,20))
+          screen.blit(textsurface2,(0,40))
           screen.blit(textlevel,(310,0))
           screen.blit(textattack,(240,450))
           screen.blit(textdefend,(350,450))
@@ -218,8 +250,15 @@ while carryOn:
           if healthm > 0:
             time.sleep(1)
             attack_or_defend_m = random.choice(["valt aan", "verdedigd"])
+            if attack_or_defend_m == "valt aan":
+              #Dit is gewoon voor de speler meer kans te geven
+              isittrue = random.choice(["valt aan", "verdedigd"])
+              attack_or_defend_m = isittrue
+
+            #print wat het monster doet
             print("\n"+"Het monster "+attack_or_defend_m+"\n")
 
+            #Het monster valt aan
             if attack_or_defend_m == "valt aan":
               defenserandom = random.randint(1,10)
               if defensePlr == True:  
@@ -230,6 +269,7 @@ while carryOn:
                   attackm = str(attackm)
                   print("Het monster heeft je kunnen aanvallen! Je verliest "+attackm)
                   attackm = int(attackm)
+
               if defensePlr == False:  
                 if defenserandom <= 4:
                   print("Je hebt de aanval kunnen ontwijken!")
@@ -238,7 +278,10 @@ while carryOn:
                   attackm = str(attackm)
                   print("Het monster heeft je kunnen aanvallen! Je verliest "+attackm)
                   attackm = int(attackm)
+                defensePlr = False
 
+            if attack_or_defend_m == "verdedigd":
+              defenseM = True
           Played = False
 
         if healthm <= 0:
