@@ -5,7 +5,7 @@ from monster import Monster
 pygame.init()
 
 #player stats 
-tutorial = False
+tutorial = True
 start = True
 Help = False
 
@@ -34,6 +34,8 @@ myfont = pygame.font.SysFont('Corbel', 30)
 
 pygame.display.set_caption("Dungeon")
 
+gameover = False
+winner = False
 carryOn = True
 clock = pygame.time.Clock()
 
@@ -74,6 +76,7 @@ while carryOn:
   while health > 0:
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
+                health = 0
                 carryOn=False
             elif event.type==pygame.KEYDOWN:
                 if event.key==pygame.K_x:
@@ -95,8 +98,7 @@ while carryOn:
                     Help = False
                     Start = True
                     screen.fill(GREY)
-                    pygame.display.flip()
-                  
+                    pygame.display.flip()              
 
         keys = pygame.key.get_pressed()
 
@@ -113,6 +115,28 @@ while carryOn:
             PlayerChar.moveRight(5, stappen)
           elif stappen >= 450:
             if healthm <= 0:
+              #Clear console voor volgend level
+              print('\033c')
+
+              #Power-ups
+              find = random.randint(1,10)
+              if find <= 6:
+                #Niks gevonden
+                print("Je hebt in dit level niks gevonden.")
+              elif find == 7:
+                print("Je hebt een beter zwaard gevonden en je doet daardoor 1 strenght meer damage")
+                strenght += 1
+              elif find == 8:
+                print("Je hebt verzorginsproducten gevonden en krijgt 2 levens erbij!")
+                health += 2
+              elif find == 9:
+                print("Je hebt een heel goed zwaard gevonden je doet 2 damage meer!")
+                strenght += 2
+              elif find == 10:
+                print("Je vind verzorginsproducten en krijgt 1 leven erbij!")
+                health += 1
+
+              print("")
               print("Next level")
               PlayerChar.rect.x = 100
               PlayerChar.rect.y = 300
@@ -124,9 +148,14 @@ while carryOn:
               nextarrow = myfont.render(" ", False, (0, 0, 0))
               screen.blit(nextarrow,(500,300))
               
+              #Past stats aan
               level += 1
               strenght += 1
-              healthm = healthm2*2
+              if healthm2 < 10:
+                healthm = healthm2*2
+              else:
+                rndmhealth = random.randint(1,10)
+                healthm = healthm2+ rndmhealth
               healthm2 = healthm
               attackm += 1
                     
@@ -225,9 +254,17 @@ while carryOn:
           screen.blit(helpback,(290,450))
 
         if start == False and Help == False:
+          #Player stats
           textplrstats = myfont.render("PLAYER STATS: ", False, (0, 0, 0))
           textsurface = myfont.render("HEALTH: "+str(health), False, (0, 0, 0))
           textsurface2 = myfont.render("STRENGHT: "+str(strenght), False, (0, 0, 0))
+          #Monster stats
+          if healthm < 0:
+            healthm = 0
+          textmstats = myfont.render("MONSTER STATS: ", False, (0, 0, 0))
+          textm = myfont.render("HEALTH: "+str(healthm), False, (0, 0, 0))
+          textm2 = myfont.render("STRENGHT: "+str(attackm), False, (0, 0, 0))
+          #Others
           textlevel = myfont.render("LEVEL: "+str(level), False, (0, 0, 0))
           textattack = myfont.render("|Q: Attack|", False, (0, 0, 0))
           textdefend = myfont.render("|W: Defend|", False, (0, 0, 0))
@@ -235,6 +272,9 @@ while carryOn:
           screen.blit(textplrstats,(0,0))
           screen.blit(textsurface,(0,20))
           screen.blit(textsurface2,(0,40))
+          screen.blit(textmstats,(520,0))
+          screen.blit(textm,(520,20))
+          screen.blit(textm2,(520,40))
           screen.blit(textlevel,(310,0))
           screen.blit(textattack,(240,450))
           screen.blit(textdefend,(350,450))
@@ -291,8 +331,14 @@ while carryOn:
 
 
           #arrow
-          nextarrow = myfont.render("Next level --> ", False, (0, 0, 0))
-          screen.blit(nextarrow,(500,300))
+          if level < 20:
+            nextarrow = myfont.render("Next level --> ", False, (0, 0, 0))
+            screen.blit(nextarrow,(500,300))
+           
+          else:
+            nextarrow = myfont.render("WINNER!!!", False, (0, 0, 0))
+            screen.blit(nextarrow,(300,200))
+            winner = True
 
 
         mouse = pygame.mouse.get_pos()  
@@ -302,6 +348,5 @@ while carryOn:
 
         #Frames per second
         clock.tick(30)
-        
   carryOn = False
 pygame.quit()
